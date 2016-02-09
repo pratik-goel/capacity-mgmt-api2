@@ -179,7 +179,7 @@ public class Application {
                producer.send(data);
         }
         producer.close();*/
-		return "Capacity Management Microservice Running.  Connected to Mongo";
+		return "Capacity Management Microservice Running.";
 	}
 
     /**
