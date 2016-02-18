@@ -130,7 +130,7 @@ public class Application {
 	      };
 	    }
 	}*/
-	
+/*	
 	@Configuration
 	public static class ConsumerConfiguration {
 
@@ -199,7 +199,7 @@ public class Application {
 	        })
 	        .get();
 	    }
-	}
+	}*/
 	
 
 	public static void main(String[] args) {
