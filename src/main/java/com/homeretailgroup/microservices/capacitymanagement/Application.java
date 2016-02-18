@@ -1,30 +1,55 @@
 package com.homeretailgroup.microservices.capacitymanagement;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.integration.config.EnableIntegration;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.SourcePollingChannelAdapterSpec;
+import org.springframework.integration.dsl.kafka.Kafka;
+import org.springframework.integration.dsl.kafka.KafkaHighLevelConsumerMessageSourceSpec;
+import org.springframework.integration.dsl.support.Consumer;
+import org.springframework.integration.kafka.support.ZookeeperConnect;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 @EnableIntegration
 @SpringBootApplication
 public class Application {
-	@Autowired
-	private CollectionPointRepository repository;
 	
-	/*@Component
+	private static CollectionPointRepository repository;
+	
+	@Autowired
+	public void setRepository(CollectionPointRepository repository) {
+		Application.repository = repository;
+	}
+	
+	@Component
 	public static class KafkaConfig {
 
 	    @Value("${kafka.topic:test}")
@@ -59,7 +84,7 @@ public class Application {
 	}
 	
 	
-	@Configuration
+	/*@Configuration
 	public static class ProducerConfiguration {
 
 	    @Autowired
@@ -104,7 +129,7 @@ public class Application {
 	            .handle(messageHandlerSpec);
 	      };
 	    }
-	}
+	}*/
 	
 	@Configuration
 	public static class ConsumerConfiguration {
@@ -134,22 +159,50 @@ public class Application {
 	      return IntegrationFlows
 	        .from(messageSourceSpec, endpointConfigurer)
 	        .<Map<String, List<String>>>handle((payload, headers) -> {
-	            payload.entrySet().forEach(e -> log.info(e.getKey() + '=' + e.getValue()));
+	        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	        	System.out.println("see Pratik > " + payload.toString());
+	        	payload.entrySet().forEach(e -> {
+	        		Map hm = (Map)e.getValue();
+	        		//for(Object obj2 : hm.entrySet()){
+	        			String message = (String)((ArrayList)hm.get(0)).get(0);
+	                    System.out.println(message);
+	                    //JsonJsonParser jp = new JsonJsonParser();
+	                    ObjectMapper objectMapper = new ObjectMapper();
+	                    Map<String, Object> parsedMap = null;
+						try {
+							parsedMap = objectMapper.readValue(message, HashMap.class);
+						} catch (Exception e2) {
+							e2.printStackTrace();
+						}
+						String collectionPointId = null;
+						String quantity = null;
+						Date date = null;
+	                    if(parsedMap.containsKey("placeOrder")) {
+	                    	Map<String, String> mapContents = (Map)parsedMap.get("placeOrder");
+	                    	collectionPointId = mapContents.get("collectionPointId");
+	                    	quantity = mapContents.get("quantity");
+	                    	try {
+	        					date = sdf.parse(mapContents.get("date"));
+	        				} catch (ParseException e1) {
+	        					e1.printStackTrace();
+	        				}
+	                    }
+	                    Capacity capacity = repository.findByCollectionPointId(collectionPointId);
+	                    Availability availability = capacity.getAvailability(date);
+	                    availability.setCapacity(Integer.toString(Integer.parseInt(availability.getCapacity()) - Integer.parseInt(quantity)));
+	                    capacity.updateAvailability(availability);
+	                    repository.save(capacity);
+	        		//}
+	        	});
+	            //payload.entrySet().forEach(e -> log.info(e.getKey() + '=' + e.getValue()));
 	            return null;
 	        })
 	        .get();
 	    }
-	}*/
+	}
 	
 
 	public static void main(String[] args) {
-		/*String zooKeeper = "192.168.99.100:2181";//args[0];
-        String groupId = "testGroup";//args[1];
-        String topic = "test";//args[2];
-        int threads = 3;//Integer.parseInt(args[3]);
- 
-        KafkaConsumer kafkaConsumer = new KafkaConsumer(zooKeeper, groupId, topic, repository);
-        kafkaConsumer.run(threads);*/
 		SpringApplication.run(Application.class, args);
 	}
 
@@ -179,7 +232,14 @@ public class Application {
                producer.send(data);
         }
         producer.close();*/
-		return "Capacity Management Microservice Running. Connected to Mongo!! -- Pratik";
+		/*String zooKeeper = "192.168.99.100:2181";//args[0];
+        String groupId = "testGroup";//args[1];
+        String topic = "test";//args[2];
+        int threads = 3;//Integer.parseInt(args[3]);
+ 
+        KafkaConsumer kafkaConsumer = new KafkaConsumer(zooKeeper, groupId, topic, repository);
+        kafkaConsumer.run(threads);*/
+		return "Capacity Management Microservice Running. Connected to Mongo";
 	}
 
     /**

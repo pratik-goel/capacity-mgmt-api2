@@ -167,10 +167,6 @@
                 				<links>
 								  <link>${docker.image.prefix}-mongo:mongodblink</link>
 								</links>
-                				<ports>
-                					<port>8080:8080</port>
-                					<port>8000:8000</port>
-                				</ports>
                 			</run>
                 		</image>
                 	</images>
