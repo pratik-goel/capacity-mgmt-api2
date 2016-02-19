@@ -28,7 +28,7 @@ public class SpringMongoConfig extends AbstractMongoConfiguration {
     @Override
     @Bean
     public Mongo mongo() throws Exception {
-        return new MongoClient("capacity-mgmt-service-mongo");
+        return new MongoClient("masos_capacity-mgmt-service-mongo_1");
     }
 
 }
