@@ -55,10 +55,10 @@ public class Application {
 	    @Value("${kafka.topic:test}")
 	    private String topic;
 
-	    @Value("${kafka.address:192.168.99.100:9092}")
+	    @Value("${kafka.address:192.168.99.101:9092}")
 	    private String brokerAddress;
 
-	    @Value("${zookeeper.address:192.168.99.100:2181}")
+	    @Value("${zookeeper.address:192.168.99.101:2181}")
 	    private String zookeeperAddress;
 
 	    KafkaConfig() {
@@ -213,7 +213,7 @@ public class Application {
         Random rnd = new Random();
 
         Properties props = new Properties();
-        props.put("metadata.broker.list", "192.168.99.100:9092");
+        props.put("metadata.broker.list", "192.168.99.101:9092");
         props.put("producer.type", "sync");
         props.put("serializer.class", "kafka.serializer.StringEncoder");
         props.put("partitioner.class", "com.homeretailgroup.microservices.capacitymanagement.KafkaPartitioner");
@@ -232,7 +232,7 @@ public class Application {
                producer.send(data);
         }
         producer.close();*/
-		/*String zooKeeper = "192.168.99.100:2181";//args[0];
+		/*String zooKeeper = "192.168.99.101:2181";//args[0];
         String groupId = "testGroup";//args[1];
         String topic = "test";//args[2];
         int threads = 3;//Integer.parseInt(args[3]);
