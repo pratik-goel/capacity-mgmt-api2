@@ -130,7 +130,7 @@ public class Application {
 	      };
 	    }
 	}*/
-/*	
+	
 	@Configuration
 	public static class ConsumerConfiguration {
 
@@ -154,14 +154,14 @@ public class Application {
 	              .maxMessages(10)
 	              .valueDecoder(String::new));
 
-	      Consumer<SourcePollingChannelAdapterSpec> endpointConfigurer = e -> e.poller(p -> p.fixedDelay(100));
+	      Consumer<SourcePollingChannelAdapterSpec> endpointConfigurer = e -> e.poller(p -> p.fixedDelay(2000));
 
 	      return IntegrationFlows
 	        .from(messageSourceSpec, endpointConfigurer)
 	        .<Map<String, List<String>>>handle((payload, headers) -> {
 	        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	        	System.out.println("see Pratik > " + payload.toString());
-	        	payload.entrySet().forEach(e -> {
+	        	System.out.println("Kafka message received > " + payload.toString());
+	        	/*payload.entrySet().forEach(e -> {
 	        		Map hm = (Map)e.getValue();
 	        		//for(Object obj2 : hm.entrySet()){
 	        			String message = (String)((ArrayList)hm.get(0)).get(0);
@@ -193,13 +193,13 @@ public class Application {
 	                    capacity.updateAvailability(availability);
 	                    repository.save(capacity);
 	        		//}
-	        	});
+	        	});*/
 	            //payload.entrySet().forEach(e -> log.info(e.getKey() + '=' + e.getValue()));
 	            return null;
 	        })
 	        .get();
 	    }
-	}*/
+	}
 	
 
 	public static void main(String[] args) {
