@@ -241,6 +241,11 @@ public class Application {
         kafkaConsumer.run(threads);*/
 		return "Capacity Management Microservice Running. Connected to Mongo";
 	}
+	
+	@RequestMapping("/test")
+	public void test(){
+		System.out.println("Test");
+	}
 
     /**
      * Entry point for a GET Capacity details request.
